@@ -4,11 +4,12 @@
 #include "tensor.h"
 
 namespace synapse {
-Tensor add(const Tensor &t1, const Tensor &t2);
-Tensor mul(const Tensor &t1, const Tensor &t2);
-Tensor matmul(const Tensor &t1, const Tensor &t2);
+auto add(const Tensor &tensor_1, const Tensor &tensor_2) -> Tensor;
+auto mul(const Tensor &tensor_1, const Tensor &tensor_2) -> Tensor;
+auto matmul(const Tensor &tensor_1, const Tensor &tensor_2) -> Tensor;
 
-bool is_close(const Tensor &t1, const Tensor &t2, double tol = 1e-5f);
+auto is_close(const Tensor &tensor_1, const Tensor &tensor_2, float tol = 1e-5F)
+    -> bool;
 } // namespace synapse
 
 #endif // !FUNC
