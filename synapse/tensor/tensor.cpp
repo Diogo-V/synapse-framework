@@ -1,19 +1,18 @@
 #include "tensor.h"
 #include "ndarray.h"
 #include <string>
+#include <utility>
 #include <vector>
 
 synapse::Tensor::Tensor(std::vector<float> data, synapse::Shape shape)
-    : synapse::NDArray(data, shape) {
-  // Does not need to initialize anything else
+    : synapse::NDArray(std::move(data), std::move(shape)) {
+  // Move the data into the parent class instead of copying
 }
 
-synapse::Tensor::~Tensor() {
-  // Does not need to clean anything
-}
+synapse::Tensor::~Tensor() = default; // Does not need to deallocate anything
 
-const std::string synapse::Tensor::to_string() const {
-  std::string out{""};
+auto synapse::Tensor::to_string() const -> std::string {
+  std::string out;
   out += synapse::NDArray::to_string();
   return out;
 }

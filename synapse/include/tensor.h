@@ -8,10 +8,14 @@
 namespace synapse {
 class Tensor : public NDArray {
 public:
+  Tensor(const Tensor &) = default;
+  Tensor(Tensor &&) = default;
+  auto operator=(const Tensor &) -> Tensor & = default;
+  auto operator=(Tensor &&) -> Tensor & = default;
   Tensor(std::vector<float> data, synapse::Shape shape);
   ~Tensor();
 
-  const std::string to_string() const;
+  [[nodiscard]] auto to_string() const -> std::string;
 };
 } // namespace synapse
 
