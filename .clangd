@@ -1,0 +1,63 @@
+# This file should be purely used for editor configuration.
+# Build rules will be defined in the CMakeLists file
+
+Index:
+  Background: Build
+  StandardLibrary: Yes
+
+Diagnostics:
+  UnusedIncludes: Strict
+  MissingIncludes: Strict
+
+  ClangTidy:
+    FastCheckFilter: Strict # avoid slow checks that impact editor responsiveness
+    Add:
+      - performance-*
+      - bugprone-*
+      - modernize-*
+      - clang-analyzer-*
+      - cppcoreguidelines-*
+      - readability-*
+      - concurrency-*
+    Remove: # Remove checks known to be slow or produce false positives
+      - cppcoreguidelines-pro-bounds-pointer-arithmetic # Sometimes needed for SIMD
+      - cppcoreguidelines-pro-bounds-array-to-pointer-decay # Sometimes needed for SIMD
+      - modernize-avoid-c-arrays # Sometimes needed for performance
+      - cppcoreguidelines-avoid-magic-numbers # Conflicts with ML constants
+      - readability-magic-numbers
+
+    CheckOptions:
+      # Performance tuning
+      performance-move-const-arg.CheckTriviallyCopyable: "false"
+      performance-unnecessary-value-param.AllowedTypes: "Eigen::.*"
+
+      # Naming conventions
+      readability-identifier-naming.ClassCase: CamelCase
+      readability-identifier-naming.StructCase: CamelCase
+      readability-identifier-naming.VariableCase: snake_case
+      readability-identifier-naming.ParameterCase: snake_case
+      readability-identifier-naming.FunctionCase: snake_case
+      readability-identifier-naming.ConstantCase: UPPER_CASE
+      readability-identifier-naming.NamespaceCase: snake_case
+      readability-identifier-naming.TemplateParameterCase: CamelCase
+
+      # Function size limits (looser for ML kernels)
+      readability-function-size.LineThreshold: 150
+      readability-function-size.StatementThreshold: 150
+
+      # C++23 features
+      modernize-use-std-print.StrictMode: true
+      modernize-use-ranges.UseReversePipe: true
+
+InlayHints:
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
+  Designators: Yes
+  BlockEnd: Yes
+
+Hover:
+  ShowAKA: Yes
+
+Completion:
+  AllScopes: Yes

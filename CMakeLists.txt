@@ -1,5 +1,14 @@
-cmake_minimum_required(VERSION 3.15...3.27)
-project(synapse)
+cmake_minimum_required(VERSION 3.25)
+
+project(synapse
+    VERSION 0.0.1
+    DESCRIPTION "Synapse - A high-performance library for modern AI"
+    LANGUAGES CXX
+)
+
+# ============================================================================
+# Build configuration and standards
+# ============================================================================
 
 # Helps clangd find the headers
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -7,13 +16,24 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Sets the c++ required version
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Position independent code (required for shared libraries)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# ============================================================================
+# Build types and compiler optimizations
+# ============================================================================
 
 # Set compiler flags
-set(FLAGS 
-  -Wall -Weffc++ -Wextra -Wundef -Wshadow -Wcast-align -Wpointer-arith 
-  -Wstrict-overflow=5 -Wwrite-strings -Waggregate-return -Wcast-qual 
+set(FLAGS
+  -Wall -Weffc++ -Wextra -Wundef -Wshadow -Wcast-align -Wpointer-arith
+  -Wstrict-overflow=5 -Wwrite-strings -Waggregate-return -Wcast-qual
   -Wswitch-default -Wswitch-enum -Wunreachable-code -Wconversion
-  -Werror -pedantic-errors
+  -Werror -pedantic-errors -Wold-style-cast -Wnon-virtual-dtor
+  -Woverloaded-virtual -Wmisleading-indentation
+  # Performance flags
+  -Wdouble-promotion -Wnull-dereference
 )
 
 # Add the required header files to the compiler
