@@ -1,17 +1,19 @@
 #include "ndarray.h"
 #include <algorithm>
 #include <cstddef>
+#include <format>
 #include <functional>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <string>
+#include <utility>
 #include <vector>
 
 synapse::NDArray::NDArray(std::vector<float> data, synapse::Shape shape)
-    : _data(data), _shape(shape) {
-  this->_size = data.size();
-  this->_ndim = shape.size();
+    : _data(std::move(data)), _shape(std::move(shape)),
+      _ndim(this->_shape.size()), _size(this->_data.size()) {
 
   // Computes strides where stride_i = shape_i * stride_i-1
   this->_strides = synapse::Strides(this->_ndim, 0);
@@ -21,24 +23,27 @@ synapse::NDArray::NDArray(std::vector<float> data, synapse::Shape shape)
   }
 }
 
-synapse::NDArray::~NDArray() {
-  // No action required
+synapse::NDArray::~NDArray() = default; // No action required
+
+auto synapse::NDArray::shape() const -> const synapse::Shape & {
+  return this->_shape;
 }
 
-const synapse::Shape &synapse::NDArray::shape() const { return this->_shape; }
-
-const synapse::Strides &synapse::NDArray::strides() const {
+auto synapse::NDArray::strides() const -> const synapse::Strides & {
   return this->_strides;
 }
 
-std::vector<float> &synapse::NDArray::data() { return this->_data; }
-const std::vector<float> &synapse::NDArray::data() const { return this->_data; }
-size_t synapse::NDArray::ndim() const { return this->_ndim; }
-size_t synapse::NDArray::size() const { return this->_size; }
+auto synapse::NDArray::data() -> std::vector<float> & { return this->_data; }
+auto synapse::NDArray::data() const -> const std::vector<float> & {
+  return this->_data;
+}
+auto synapse::NDArray::ndim() const -> size_t { return this->_ndim; }
+auto synapse::NDArray::size() const -> size_t { return this->_size; }
 
-bool synapse::NDArray::is_contigous() {
-  if (this->_ndim == 1)
+auto synapse::NDArray::is_contigous() -> bool {
+  if (this->_ndim == 1) {
     return true;
+  }
 
   for (size_t i = this->_ndim - 1; i > 0; --i) {
     if (this->_strides[i - 1] != this->_shape[i] * this->_strides[i]) {
@@ -48,9 +53,10 @@ bool synapse::NDArray::is_contigous() {
   return true;
 }
 
-const std::string synapse::NDArray::to_string() const {
-  if (this->size() == 0)
+auto synapse::NDArray::to_string() const -> std::string {
+  if (this->size() == 0) {
     return "[]";
+  }
 
   std::ostringstream oss;
 
@@ -61,13 +67,14 @@ const std::string synapse::NDArray::to_string() const {
   // this level.
   std::function<void(size_t, size_t, const std::string &)> rec;
   rec = [this, &oss, &rec](size_t offset, size_t current_dim,
-                           const std::string &indent) {
+                           const std::string &indent) -> void {
     oss << "[";
     // If we are at the last dimension, simply print the numbers.
     if (current_dim == this->ndim() - 1) {
       for (size_t i = 0; i < this->shape()[current_dim]; i++) {
-        if (i > 0)
+        if (i > 0) {
           oss << ", ";
+        }
         oss << std::fixed << std::setprecision(3) << this->data()[offset + i];
       }
     } else {
@@ -78,10 +85,11 @@ const std::string synapse::NDArray::to_string() const {
       }
       // Loop over the current dimension.
       for (size_t i = 0; i < this->shape()[current_dim]; i++) {
-        if (i > 0)
+        if (i > 0) {
           oss << ",\n" << indent << " ";
+        }
         // Recursively print the subarray.
-        rec(offset + i * subarray_size, current_dim + 1, indent + " ");
+        rec(offset + (i * subarray_size), current_dim + 1, indent + " ");
       }
     }
     oss << "]";
@@ -92,11 +100,13 @@ const std::string synapse::NDArray::to_string() const {
 }
 
 // Converts an N dimensional index into a position in the vector of data
-size_t synapse::nd_index_to_pos(const synapse::Shape &indices,
-                                const synapse::Strides &strides) {
+auto synapse::nd_index_to_pos(const synapse::Shape &indices,
+                              const synapse::Strides &strides) -> size_t {
   if (indices.size() != strides.size()) {
     throw std::invalid_argument(
-        "Number of dimensions in indices and strides do not match.");
+        std::format("Number of dimensions in indices and strides do not match. "
+                    "Found indices size {} and strides size {}.",
+                    indices.size(), strides.size()));
   }
   size_t pos{0};
   for (size_t i = 0; i < indices.size(); i++) {
@@ -106,8 +116,8 @@ size_t synapse::nd_index_to_pos(const synapse::Shape &indices,
 }
 
 // Converts a position in a vector of data into an N dimensional index
-synapse::Shape synapse::pos_to_nd_index(size_t pos,
-                                        const synapse::Shape &shape) {
+auto synapse::pos_to_nd_index(size_t pos, const synapse::Shape &shape)
+    -> synapse::Shape {
   synapse::Shape out(shape.size());
   for (size_t i = shape.size(); i-- > 0;) {
     out[i] = pos % shape[i];
@@ -116,14 +126,15 @@ synapse::Shape synapse::pos_to_nd_index(size_t pos,
   return out;
 }
 
-synapse::Shape synapse::shape_broadcast(const synapse::Shape &s1,
-                                        const synapse::Shape &s2) {
-  size_t len1 = s1.size(), len2 = s2.size();
+auto synapse::shape_broadcast(const synapse::Shape &shape_1,
+                              const synapse::Shape &shape_2) -> synapse::Shape {
+  size_t len1 = shape_1.size();
+  size_t len2 = shape_2.size();
   size_t out_size = std::max(len1, len2);
   synapse::Shape out(out_size);
 
-  auto it_s1 = s1.crbegin();
-  auto it_s2 = s2.crbegin();
+  auto it_s1 = shape_1.crbegin();
+  auto it_s2 = shape_2.crbegin();
   auto it_out = out.rbegin();
 
   // Starts from the end and figures the out shape between the two by following
@@ -142,10 +153,12 @@ synapse::Shape synapse::shape_broadcast(const synapse::Shape &s1,
 
     *it_out = std::max(sz1, sz2);
 
-    if (i < len1)
+    if (i < len1) {
       ++it_s1;
-    if (i < len2)
+    }
+    if (i < len2) {
       ++it_s2;
+    }
     ++it_out;
   }
 

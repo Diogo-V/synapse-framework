@@ -1,5 +1,6 @@
 #include "ndarray.h"
 #include <gtest/gtest.h>
+#include <stdexcept>
 #include <vector>
 
 class NDArrayTests : public ::testing::Test {};
@@ -68,24 +69,24 @@ TEST(NDArrayTest, IndexingOperator) {
 
 TEST(NDArrayTest, ToString) {
   // 1D Tensor Test
-  synapse::NDArray arr1d({1.23f, 4.56f, 7.89f}, {3});
+  synapse::NDArray arr1d({1.23F, 4.56F, 7.89F}, {3});
   EXPECT_EQ(arr1d.to_string(), "[1.230, 4.560, 7.890]");
 
   // 2D Tensor Test
-  synapse::NDArray arr2d({1.23f, 4.56f, 7.89f, 2.34f, 5.67f, 8.90f}, {2, 3});
+  synapse::NDArray arr2d({1.23F, 4.56F, 7.89F, 2.34F, 5.67F, 8.90F}, {2, 3});
   EXPECT_EQ(arr2d.to_string(),
             "[[1.230, 4.560, 7.890],\n [2.340, 5.670, 8.900]]");
 
   // 3D Tensor Test
   synapse::NDArray arr3d(
-      {1.23f, 4.56f, 7.89f, 2.34f, 5.67f, 8.90f, 9.01f, 3.21f, 6.54f},
+      {1.23F, 4.56F, 7.89F, 2.34F, 5.67F, 8.90F, 9.01F, 3.21F, 6.54F},
       {3, 1, 3});
   EXPECT_EQ(arr3d.to_string(), "[[[1.230, 4.560, 7.890]],\n [[2.340, 5.670, "
                                "8.900]],\n [[9.010, 3.210, 6.540]]]");
 
   // 3D Tensor (More complex shape)
-  synapse::NDArray arr3d_complex({1.23f, 4.56f, 7.89f, 2.34f, 5.67f, 8.90f,
-                                  9.01f, 3.21f, 6.54f, 7.77f, 8.88f, 9.99f},
+  synapse::NDArray arr3d_complex({1.23F, 4.56F, 7.89F, 2.34F, 5.67F, 8.90F,
+                                  9.01F, 3.21F, 6.54F, 7.77F, 8.88F, 9.99F},
                                  {3, 2, 2});
   EXPECT_EQ(arr3d_complex.to_string(), "[[[1.230, 4.560],\n  [7.890, 2.340]],\n"
                                        " [[5.670, 8.900],\n  [9.010, 3.210]],\n"
