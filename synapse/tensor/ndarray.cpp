@@ -23,8 +23,6 @@ synapse::NDArray::NDArray(std::vector<float> data, synapse::Shape shape)
   }
 }
 
-synapse::NDArray::~NDArray() = default; // No action required
-
 auto synapse::NDArray::shape() const -> const synapse::Shape & {
   return this->_shape;
 }

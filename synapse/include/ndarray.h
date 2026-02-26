@@ -70,11 +70,12 @@ auto shape_broadcast(const Shape &shape_1, const Shape &shape_2) -> Shape;
 
 /**
  * @brief An N-dimensional array (Tensor) container.
- * * NDArray manages a flat block of memory and uses a `Shape` and `Strides`
- * to provide a multi-dimensional view of that data.
+ *
+ * @details NDArray manages a flat block of memory and uses a `Shape` and
+ * `Strides` to provide a multi-dimensional view of that data.
  *
  * ### Example
- * ```cpp
+ * ```
  * synapse::NDArray arr({1, 2, 3, 4}, {2, 2});
  * float val = arr(0, 1); // Accesses first row, second column
  * ```
@@ -86,7 +87,7 @@ public:
   auto operator=(const NDArray &) -> NDArray & = default;
   auto operator=(NDArray &&) -> NDArray & = default;
   NDArray(std::vector<float> data, Shape shape);
-  ~NDArray();
+  ~NDArray() = default;
 
   // Accessors
   [[nodiscard]] auto shape() const -> const Shape &;
