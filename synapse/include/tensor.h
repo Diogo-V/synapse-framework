@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 
+/**
+ * @brief Tensor container
+ */
 namespace synapse {
 class Tensor : public NDArray {
 public:
